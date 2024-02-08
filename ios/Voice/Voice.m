@@ -497,8 +497,7 @@
   ];
 }
 
-- (void)sendResult:(NSDictionary *) error
-                  :(SFSpeechRecognitionResult*)result
+- (void)sendResult:(NSDictionary *) error:(SFSpeechRecognitionResult*)result
                   :(NSArray *)transcriptions
                   :(NSNumber *)isFinal {
   if (error != nil) {
