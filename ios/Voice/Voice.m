@@ -302,6 +302,9 @@
   // recording is finished
   self.recognitionRequest.shouldReportPartialResults = YES;
 
+  // Use on-device recognition so we can make longer transcriptions (online only goes for 60 seconds)
+  self.recognitionRequest.requiresOnDeviceRecognition = true;
+
   if (self.recognitionRequest == nil) {
     [self sendResult:@{@"code" : @"recognition_init"}:nil:nil:nil];
     [self teardown];
@@ -364,7 +367,7 @@
                              addObject:transcription.formattedString];
                        }
 
-                       [self sendResult :nil :result.bestTranscription.formattedString :transcriptionDics :[NSNumber numberWithBool:isFinal]];
+                       [self sendResult :nil :result :transcriptionDics :[NSNumber numberWithBool:isFinal]];
 
                        if (isFinal || self.recognitionTask.isCancelled ||
                            self.recognitionTask.isFinishing) {
@@ -501,9 +504,9 @@
   if (error != nil) {
     [self sendEventWithName:@"onSpeechError" body:@{@"error" : error}];
   }
-  if (bestTranscription != nil) {
-    [self sendEventWithName:@"onSpeechResults"
-                       body:@{@"value" : @[ bestTranscription ]}];
+  if (result != nil && result.bestTranscription != nil) {
+    [self sendEventWithName:@"onSpeechResults" 
+      body:@{@"value":result.bestTranscription.formattedString, @"speechStartTimestamp":@(result.speechRecognitionMetadata.speechStartTimestamp), @"speechDuration":@(result.speechRecognitionMetadata.speechDuration),  @"confidence":@(0)} ];
   }
   if (transcriptions != nil) {
     [self sendEventWithName:@"onSpeechPartialResults"
